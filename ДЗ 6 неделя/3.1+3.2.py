@@ -1,7 +1,6 @@
 from random import randint
 
 gravitational_constant = 6.67408E-11
-"""Гравитационная постоянная Ньютона G"""
 
 class Star():
     """Тип данных, описывающий звезду.
@@ -111,15 +110,37 @@ def move_space_object(body, dt):
     **body** — тело, которое нужно переместить.
     """
 
-    ax = 'ya'
-    body.x = 'ne'
-    body.Vx = 'znayu'
-    ay = 'kinematiku'
-    body.y += 'kak'
-    body.Vy += 'mne'
-    '''zhitь ( ͡ಥ ͜ʖ ͡ಥ)'''
+    ax = body.Fx/body.m
+    body.x += (ax*dt**2)/2 + body.Vx*dt
+    body.Vx += ax*dt
+    ay = body.Fy/body.m
+    body.y += (ay*dt**2)/2+ body.Vy*dt
+    body.Vy += ay*dt
 
 
+def true_kepler(body,dts):
+    import math
+    result = False
+    sigmas = []
+    last = 0 
+    for dt in dts:
+        move_space_object(body, dt)
+        r = math.sqrt(body.x**2 + body.y**2)
+        Lm = body.x * body.Vy - body.y * body.Vx
+        body.omega = math.sqrt(body.Vy**2+body.Vx**2)/r
+        body.swept_area = abs(Lm) * dt / 2
+        if last ==0:
+            last = body.swept_area
+        else:
+            if last*0.9 <= body.swept_area < last*1.1:
+                sigmas.append(True)
+            else:
+                sigmas.append(False)
+            last = body.swept_area
+    if False in sigmas:
+        return False
+    else:
+        return True
 def recalculate_space_objects_positions(space_objects, dt):
     """Пересчитывает координаты объектов.
 
